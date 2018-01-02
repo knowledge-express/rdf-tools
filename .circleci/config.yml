@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/feedbackfruits-knowledge
+    docker:
+      - image: node:8
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - node_modules-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: yarn
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: node_modules-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+      - run: yarn test
+      - run: yarn run coverage
+
+      - store_artifacts:
+          path: coverage

@@ -1,0 +1,23 @@
+{
+  "check-coverage": true,
+  "per-file": false,
+  "lines": 0,
+  "statements": 0,
+  "functions": 0,
+  "branches": 0,
+  "include": [
+    "dist/**/*.js"
+  ],
+  "exclude": [
+  ],
+  "reporter": [
+    "lcov",
+    "text",
+    "text-summary"
+  ],
+  "require": [
+  ],
+  "extension": [
+  ],
+  "all": true
+}

@@ -7,6 +7,34 @@
   "bin": {
     "rdf-to-ts": "dist/index.js"
   },
+  "scripts": {
+    "dist": "tsc",
+    "clean": "rm -rf dist",
+    "pretest": "npm run clean && tsc --inlineSourceMap",
+    "test": "nyc ava",
+    "watch-test": "nodemon -w test -x 'npm run test'",
+    "coverage": "codecov",
+    "watch": "tsc --watch & nodemon; wait"
+  },
+  "nyc": {},
+  "ava": {
+    "files": [
+      "test/**/*.js"
+    ],
+    "source": [
+      "src/**/*.ts"
+    ],
+    "match": [],
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": false,
+    "tap": false,
+    "powerAssert": false,
+    "require": [
+      "babel-register"
+    ],
+    "babel": "inherit"
+  },
   "dependencies": {
     "@types/commander": "^2.12.2",
     "@types/globby": "^6.1.0",
@@ -17,5 +45,18 @@
     "n3": "^0.11.2",
     "semantic-toolkit": "^0.2.1",
     "typescript": "^2.6.2"
+  },
+  "devDependencies": {
+    "ava": "^0.20.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2017": "^6.24.1",
+    "codecov": "^1.0.1",
+    "nodemon": "^1.12.1",
+    "nyc": "^11.1.0"
+  },
+  "engines": {
+    "node": ">= 8",
+    "npm": ">= 5"
   }
 }
