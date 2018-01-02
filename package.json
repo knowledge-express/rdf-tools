@@ -1,0 +1,14 @@
+{
+  "name": "onto-ts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Steffan Sluis <steffansluis@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/n3": "^0.0.3",
+    "@types/node": "^8.5.2",
+    "n3": "^0.11.2",
+    "semantic-toolkit": "^0.2.1",
+    "typescript": "^2.6.2"
+  }
+}
