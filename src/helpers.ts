@@ -5,9 +5,9 @@ import * as N3 from 'n3';
 const semtools = require('semantic-toolkit');
 
 export async function getFiles(patterns: Array<string>): Promise<Array<string>> {
-  console.log('globbing pattern', patterns);
+  // console.log('globbing pattern', patterns);
   const paths = await globby(patterns, <any>{ expandDirectories: true })
-  console.log('Got paths:', paths);
+  // console.log('Got paths:', paths);
   return paths.map(name => fs.readFileSync(name).toString());
 }
 
@@ -78,6 +78,15 @@ export async function getGraph(ontology): Promise<Object> {
   }
 }
 
-export function tsify(graph): string {
-  return JSON.stringify(graph);
+export function tsify(obj): string {
+  return Object.keys(obj).reduce((memo, key) => {
+    const value = obj[key];
+    var str: string;
+
+    if (typeof value === 'string') str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
+    else str = `\n\nexport module ${key} { \n${tsify(value)}\n}`;
+
+    return memo + str;
+  }, ``);
+  // return JSON.stringify(graph);
 }

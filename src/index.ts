@@ -2,7 +2,7 @@
 
 import * as program from 'commander';
 
-import { getOntology, getGraph } from './helpers';
+import { getOntology, getGraph, tsify } from './helpers';
 const Package = require('../package');
 
 program
@@ -19,6 +19,7 @@ if (program.args.length === 0) {
   (async () => {
     const ontology = await getOntology(program.args);
     const graph = await getGraph(ontology);
-    console.log(graph);
+    const ts =  tsify(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`;
+    console.log(ts);
   })();
 }

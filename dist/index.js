@@ -25,6 +25,7 @@ else {
     (() => __awaiter(this, void 0, void 0, function* () {
         const ontology = yield helpers_1.getOntology(program.args);
         const graph = yield helpers_1.getGraph(ontology);
-        console.log(graph);
+        const ts = helpers_1.tsify(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`;
+        console.log(ts);
     }))();
 }

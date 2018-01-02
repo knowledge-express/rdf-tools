@@ -121,6 +121,10 @@ inherits@2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
 
+json2typescript@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/json2typescript/-/json2typescript-1.0.5.tgz#c3f01ab65f129fda47f0b43c06a7f1e7c9273a3d"
+
 minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"

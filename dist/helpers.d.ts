@@ -9,4 +9,4 @@ export declare function invertObject(obj: {
     [index: string]: string;
 };
 export declare function getGraph(ontology: any): Promise<Object>;
-export declare function tsify(graph: any): string;
+export declare function tsify(obj: any): string;

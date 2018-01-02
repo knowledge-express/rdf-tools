@@ -14,9 +14,7 @@ const N3 = require("n3");
 const semtools = require('semantic-toolkit');
 function getFiles(patterns) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('globbing pattern', patterns);
         const paths = yield globby(patterns, { expandDirectories: true });
-        console.log('Got paths:', paths);
         return paths.map(name => fs.readFileSync(name).toString());
     });
 }
@@ -86,7 +84,15 @@ function getGraph(ontology) {
     });
 }
 exports.getGraph = getGraph;
-function tsify(graph) {
-    return JSON.stringify(graph);
+function tsify(obj) {
+    return Object.keys(obj).reduce((memo, key) => {
+        const value = obj[key];
+        var str;
+        if (typeof value === 'string')
+            str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
+        else
+            str = `\n\nexport module ${key} { \n${tsify(value)}\n}`;
+        return memo + str;
+    }, ``);
 }
 exports.tsify = tsify;
