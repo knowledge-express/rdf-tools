@@ -84,7 +84,7 @@ export function tsify(obj): string {
     var str: string;
 
     if (typeof value === 'string') str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
-    else str = `\n\nexport module ${key} { \n${tsify(value)}\n}`;
+    else str = `\nexport module ${key} { ${tsify(value)}}`;
 
     return memo + str;
   }, ``);
