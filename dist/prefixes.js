@@ -25,7 +25,10 @@ function getPrefixes(ontology) {
                 prefixes['$'] = prefixes[''];
                 delete prefixes[''];
             }
-            return prefixes;
+            return {
+                exports: ['prefixes'],
+                prefixes,
+            };
         });
     });
 }

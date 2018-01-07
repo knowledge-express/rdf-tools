@@ -1,4 +1,5 @@
 const semtools = require('semantic-toolkit');
+import * as formatter from 'typescript-formatter';
 
 import { Property, Class } from '../classes';
 
@@ -51,19 +52,53 @@ export function classToTS(classObj: Class, classIris: string[] = []): string {
   `;
 }
 
-export function classesToTS(classes: Class[]) {
-  const iris = classes.map(c => c.iri);
-  return classes.map(c => classToTS(c, iris)).join('\n');
+export function classesToTS(classesObj: { classes: Class[] }): string {
+  const iris = classesObj.classes.map(c => c.iri);
+  return classesObj.classes.map(c => classToTS(c, iris)).join('\n');
 }
 
-export function IRIsAndLiteralsToTS(obj): string {
+export function objectToTSModule(obj): string {
   return Object.keys(obj).reduce((memo, key) => {
     const value = obj[key];
     var str: string;
 
     if (typeof value === 'string') str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
-    else str = `\nexport module ${key} { ${IRIsAndLiteralsToTS(value)}}`;
+    else str = `\nexport module ${key} { ${objectToTSModule(value)} };`;
 
     return memo + str;
   }, ``);
+}
+
+export function prefixesToTS({ prefixes }: { prefixes: string[] }): string {
+  return objectToTSModule({ prefixes });
+}
+
+export function IRIsToTS({ iris }: { iris: string[] }): string {
+  return objectToTSModule({ iris });
+}
+
+export function literalsToTS({ literals }: { literals: string[] }): string {
+  return objectToTSModule({ literals });
+}
+
+export function defaultExportsToTS(defaultExports: string[]): string {
+  return `\n\nexport default {\n${defaultExports.join(',\n')}\n};`;
+}
+
+export const formatterOptions = {
+  replace: false,
+  verify: false,
+  tsconfig: false,
+  tsconfigFile: null,
+  tslint: false,
+  tslintFile: null,
+  editorconfig: false,
+  vscode: false,
+  vscodeFile: null,
+  tsfmt: false,
+  tsfmtFile: null
+};
+
+export async function formatTS(ts: string, options: formatter.Options = formatterOptions): Promise<string> {
+   return (await formatter.processString('', ts, formatterOptions)).dest;
 }

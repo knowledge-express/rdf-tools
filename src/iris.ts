@@ -4,9 +4,9 @@ import { getPrefixes } from './prefixes';
 import * as Helpers from './helpers';
 
 // TODO: Literals
-export async function getIRIsAndLiterals(ontology): Promise<Object> {
+export async function getIRIs(ontology): Promise<{ exports: string[], iris: Object }> {
   const triples = Helpers.getTriples(ontology);
-  const prefixes = await getPrefixes(ontology);
+  const { prefixes } = await getPrefixes(ontology);
   const prefixMap = Helpers.invertObject(prefixes);
 
   const graph = triples.reduce((memo, triple) => {
@@ -27,8 +27,7 @@ export async function getIRIsAndLiterals(ontology): Promise<Object> {
   }, {});
 
   return {
-    exports: [ 'graph' ],
-    iris: graph,
-    literals: {}
-  }
+    exports: [ 'iris' ],
+    iris: graph
+  };
 }

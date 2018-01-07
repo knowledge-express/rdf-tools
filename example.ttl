@@ -26,6 +26,6 @@
   owl:inverseOf :tag .
 
 :score
-  a owl:DatatypeProperty ;
+  a owl:DatatypeProperty, owl:FunctionalProperty ;
   rdfs:domain :Tag ;
   rdfs:range xsd:decimal .

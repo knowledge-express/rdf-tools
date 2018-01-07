@@ -60,5 +60,7 @@
   "engines": {
     "node": ">= 8",
     "npm": ">= 5"
-  }
+  },
+  "description": "Generate TypeScript from RDF",
+  "repository": "git@github.com:knowledge-express/rdf-to-ts.git"
 }

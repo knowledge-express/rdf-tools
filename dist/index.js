@@ -13,40 +13,67 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const program = require("commander");
-const formatter = require("typescript-formatter");
 const Helpers = require("./helpers");
-const iris_and_literals_1 = require("./iris-and-literals");
+const prefixes_1 = require("./prefixes");
+const iris_1 = require("./iris");
 const classes_1 = require("./classes");
 const Package = require('../package');
-const formatterOptions = {
-    replace: false,
-    verify: false,
-    tsconfig: false,
-    tsconfigFile: null,
-    tslint: false,
-    tslintFile: null,
-    editorconfig: false,
-    vscode: false,
-    vscodeFile: null,
-    tsfmt: false,
-    tsfmtFile: null
+const defaultConfig = {
+    prefixes: true,
+    iris: true,
+    literals: true,
+    classes: true,
+    defaultExports: true,
 };
+function getConfig(config, defaultConfig) {
+    const { prefixes, iris, literals, classes, defaultExports } = config;
+    if (!(prefixes || iris || literals || classes))
+        return defaultConfig;
+    return {
+        prefixes,
+        iris,
+        literals,
+        classes,
+        defaultExports,
+    };
+}
 if (require.main === module) {
     program
         .version(Package.version)
+        .description(Package.description)
+        .option('-p, --prefixes', 'output prefixes')
+        .option('-i, --iris', 'output IRIs')
+        .option('-l, --literals', 'output literals')
+        .option('-c, --classes', 'output classes')
+        .option('-d, --default-exports', 'output default exports. Can only be used in combination with other flags')
         .usage('[options] <pattern>');
     program.parse(process.argv);
     (() => __awaiter(this, void 0, void 0, function* () {
         if (program.args.length === 0)
             throw new Error('You must enter a glob pattern.');
-        const ontology = yield Helpers.getOntology(program.args);
-        const graph = yield iris_and_literals_1.getIRIsAndLiterals(ontology);
-        const classes = yield classes_1.getClasses(ontology);
-        const ts = (yield formatter.processString('', Helpers.classesToTS(classes) + Helpers.IRIsAndLiteralsToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
-        console.log(ts);
+        const config = getConfig(program, defaultConfig);
+        const glob = program.args;
+        const ontology = yield Helpers.getOntology(glob);
+        let ts = '', prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null };
+        if (config.prefixes) {
+            prefixes = yield prefixes_1.getPrefixes(ontology);
+            ts += Helpers.prefixesToTS(prefixes);
+        }
+        if (config.iris) {
+            iris = yield iris_1.getIRIs(ontology);
+            ts += Helpers.IRIsToTS(iris);
+        }
+        if (config.classes) {
+            classes = yield classes_1.getClasses(ontology);
+            ts += Helpers.classesToTS(classes);
+        }
+        if (config.defaultExports) {
+            const defaultExports = [].concat(prefixes.exports, iris.exports, literals.exports, classes.exports);
+            ts += Helpers.defaultExportsToTS(defaultExports);
+        }
+        console.log(yield Helpers.formatTS(ts));
     }))().catch(err => {
-        console.error(`ERROR: ${err.message}`);
-        program.help();
+        console.error(err);
         process.exit(1);
     });
     global["Knowledge"] = module.exports;
