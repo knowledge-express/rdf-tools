@@ -3,7 +3,10 @@
 import * as program from 'commander';
 import * as formatter from 'typescript-formatter';
 
-import { getOntology, getGraph, getClasses, graphToTS, classToTS } from './helpers';
+import * as Helpers from './helpers';
+import { getPrefixes } from './prefixes';
+import { getIRIsAndLiterals } from './iris-and-literals';
+import { getClasses } from './classes';
 const Package = require('../package');
 
 const formatterOptions = {
@@ -31,12 +34,12 @@ if (require.main === module) {
   (async () => {
     if (program.args.length === 0) throw new Error('You must enter a glob pattern.');
 
-    const ontology = await getOntology(program.args);
-    const graph = await getGraph(ontology);
+    const ontology = await Helpers.getOntology(program.args);
+    const graph = await getIRIsAndLiterals(ontology);
     const classes = await getClasses(ontology);
-    const ts =  (await formatter.processString('', classes + graphToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
+    const ts =  (await formatter.processString('', Helpers.classesToTS(classes) + Helpers.IRIsAndLiteralsToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
     // console.log(classes);
-    // const ts =  (await formatter.processString('', graphToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
+    // const ts =  (await formatter.processString('', IRIsAndLiteralsToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
     console.log(ts);
   })().catch(err => {
     console.error(`ERROR: ${err.message}`);

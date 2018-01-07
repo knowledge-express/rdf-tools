@@ -14,7 +14,9 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const program = require("commander");
 const formatter = require("typescript-formatter");
-const helpers_1 = require("./helpers");
+const Helpers = require("./helpers");
+const iris_and_literals_1 = require("./iris-and-literals");
+const classes_1 = require("./classes");
 const Package = require('../package');
 const formatterOptions = {
     replace: false,
@@ -37,10 +39,10 @@ if (require.main === module) {
     (() => __awaiter(this, void 0, void 0, function* () {
         if (program.args.length === 0)
             throw new Error('You must enter a glob pattern.');
-        const ontology = yield helpers_1.getOntology(program.args);
-        const graph = yield helpers_1.getGraph(ontology);
-        const classes = yield helpers_1.getClasses(ontology);
-        const ts = (yield formatter.processString('', classes + helpers_1.graphToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
+        const ontology = yield Helpers.getOntology(program.args);
+        const graph = yield iris_and_literals_1.getIRIsAndLiterals(ontology);
+        const classes = yield classes_1.getClasses(ontology);
+        const ts = (yield formatter.processString('', Helpers.classesToTS(classes) + Helpers.IRIsAndLiteralsToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
         console.log(ts);
     }))().catch(err => {
         console.error(`ERROR: ${err.message}`);
