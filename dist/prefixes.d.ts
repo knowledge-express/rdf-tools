@@ -1,3 +1,6 @@
 export declare function getPrefixes(ontology: any): Promise<{
-    [index: string]: string;
+    exports: string[];
+    prefixes: {
+        [index: string]: string;
+    };
 }>;

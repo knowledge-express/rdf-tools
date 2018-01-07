@@ -1,6 +1,6 @@
 import * as N3 from 'n3';
 
-export async function getPrefixes(ontology): Promise<{ [index: string]: string }> {
+export async function getPrefixes(ontology): Promise<{ exports: string[], prefixes: { [index: string]: string } }> {
   // Do some inefficient things to get the prefixes
   return (new Promise<{ [index: string]: string }>((resolve, reject) => {
     var prefixes;
@@ -18,6 +18,9 @@ export async function getPrefixes(ontology): Promise<{ [index: string]: string }
       delete prefixes[''];
     }
 
-    return prefixes;
+    return {
+      exports: [ 'prefixes' ],
+      prefixes,
+    }
   });
 }

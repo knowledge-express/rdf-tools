@@ -36,7 +36,10 @@ function getClasses(ontology) {
         const classIris = graph.match(null, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#Class')
             .map(t => t.subject);
         const classes = classIris.map(iri => expandClass(graph, iri));
-        return classes;
+        return {
+            exports: [],
+            classes
+        };
     });
 }
 exports.getClasses = getClasses;
