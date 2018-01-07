@@ -3,7 +3,7 @@
 import * as program from 'commander';
 import * as formatter from 'typescript-formatter';
 
-import { getOntology, getGraph, tsify } from './helpers';
+import { getOntology, getGraph, getClasses, graphToTS, classToTS } from './helpers';
 const Package = require('../package');
 
 const formatterOptions = {
@@ -28,18 +28,21 @@ if (require.main === module) {
 
   program.parse(process.argv);
 
-  if (program.args.length === 0) {
-    console.error('You must enter a glob pattern.');
+  (async () => {
+    if (program.args.length === 0) throw new Error('You must enter a glob pattern.');
+
+    const ontology = await getOntology(program.args);
+    const graph = await getGraph(ontology);
+    const classes = await getClasses(ontology);
+    const ts =  (await formatter.processString('', classes + graphToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
+    // console.log(classes);
+    // const ts =  (await formatter.processString('', graphToTS(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
+    console.log(ts);
+  })().catch(err => {
+    console.error(`ERROR: ${err.message}`);
     program.help();
     process.exit(1);
-  } else {
-    (async () => {
-      const ontology = await getOntology(program.args);
-      const graph = await getGraph(ontology);
-      const ts =  (await formatter.processString('', tsify(graph) + `\n\nexport default {\n${Object.keys(graph).join(',\n')}\n}`, formatterOptions)).dest;
-      console.log(ts);
-    })();
-  }
+  });
 
   global["Knowledge"] = module.exports;
 }

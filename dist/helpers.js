@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const globby = require("globby");
 const N3 = require("n3");
+const rdf = require('rdf');
 const semtools = require('semantic-toolkit');
 function getFiles(patterns) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -57,10 +58,24 @@ function invertObject(obj) {
     }, {});
 }
 exports.invertObject = invertObject;
+function getTriples(ontology) {
+    const parser = N3.Parser();
+    const triples = parser.parse(ontology, null);
+    return triples;
+}
+exports.getTriples = getTriples;
+function getRDFGraph(ontology) {
+    const triples = getTriples(ontology);
+    return triples.reduce((graph, triple) => {
+        const { subject, predicate, object } = triple;
+        graph.add(rdf.environment.createTriple(subject, predicate, object));
+        return graph;
+    }, new rdf.Graph);
+}
+exports.getRDFGraph = getRDFGraph;
 function getGraph(ontology) {
     return __awaiter(this, void 0, void 0, function* () {
-        const parser = N3.Parser();
-        const triples = parser.parse(ontology, null);
+        const triples = getTriples(ontology);
         const prefixes = yield getPrefixes(ontology);
         const prefixMap = invertObject(prefixes);
         const graph = triples.reduce((memo, triple) => {
@@ -84,16 +99,93 @@ function getGraph(ontology) {
     });
 }
 exports.getGraph = getGraph;
-function tsify(obj) {
+function expandProperty(graph, iri) {
+    const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).map(t => t.object);
+    const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#FunctionalProperty').length === 0;
+    return {
+        iri,
+        range,
+        isFunctional
+    };
+}
+exports.expandProperty = expandProperty;
+function expandClass(graph, iri) {
+    const superClasses = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', null).map(t => t.object);
+    const properties = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#domain', iri).map(t => t.subject).map(p => expandProperty(graph, p));
+    return {
+        iri,
+        superClasses,
+        properties,
+    };
+}
+exports.expandClass = expandClass;
+function getClasses(ontology) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const graph = getRDFGraph(ontology);
+        const classIris = graph.match(null, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#Class')
+            .map(t => t.subject);
+        const classes = classIris.map(iri => expandClass(graph, iri));
+        return classes.map(c => classToTS(c, classIris)).join('\n');
+    });
+}
+exports.getClasses = getClasses;
+const nativeTypeMap = {
+    boolean: {
+        'http://www.w3.org/2001/XMLSchema#boolean': true,
+    },
+    string: {
+        'http://www.w3.org/2001/XMLSchema#string': true,
+        'http://www.w3.org/2001/XMLSchema#duration': true,
+    },
+    number: {
+        'http://www.w3.org/2001/XMLSchema#integer': true,
+        'http://www.w3.org/2001/XMLSchema#decimal': true,
+    },
+};
+function typeForIris(iris) {
+    if (iris.length === 0)
+        throw new Error('No type for empty iris.');
+    if (iris.length === 1) {
+        const [iri] = iris;
+        if (iri in nativeTypeMap.boolean)
+            return 'boolean';
+        if (iri in nativeTypeMap.number)
+            return 'number';
+        if (iri in nativeTypeMap.string)
+            return 'string';
+        return semtools.getLocalName(iri);
+    }
+    const [first, ...rest] = iris;
+    return `(${typeForIris([first])} & ${typeForIris(rest)})`;
+}
+exports.typeForIris = typeForIris;
+function propertyToTS(propertyObj) {
+    const name = semtools.getLocalName(propertyObj.iri);
+    const type = typeForIris(propertyObj.range);
+    const plurality = propertyObj.isFunctional ? '[]' : '';
+    return `${name}: ${type}${plurality}`;
+}
+exports.propertyToTS = propertyToTS;
+function classToTS(classObj, classIris = []) {
+    const name = semtools.getLocalName(classObj.iri);
+    const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
+    const superTypes = existingSuperClasses.length === 0 ? '' : `${typeForIris(existingSuperClasses)} &`;
+    return `
+  export type ${name} = ${superTypes} {
+    ${classObj.properties.map(propertyToTS).join('\n')}
+  };
+  `;
+}
+exports.classToTS = classToTS;
+function graphToTS(obj) {
     return Object.keys(obj).reduce((memo, key) => {
         const value = obj[key];
         var str;
         if (typeof value === 'string')
             str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
         else
-            str = `\nexport module ${key} { ${tsify(value)}}`;
+            str = `\nexport module ${key} { ${graphToTS(value)}}`;
         return memo + str;
     }, ``);
 }
-exports.tsify = tsify;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGVscGVycy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9oZWxwZXJzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFDQSx5QkFBeUI7QUFDekIsaUNBQWlDO0FBQ2pDLHlCQUF5QjtBQUN6QixNQUFNLFFBQVEsR0FBRyxPQUFPLENBQUMsa0JBQWtCLENBQUMsQ0FBQztBQUU3QyxrQkFBK0IsUUFBdUI7O1FBRXBELE1BQU0sS0FBSyxHQUFHLE1BQU0sTUFBTSxDQUFDLFFBQVEsRUFBTyxFQUFFLGlCQUFpQixFQUFFLElBQUksRUFBRSxDQUFDLENBQUE7UUFFdEUsTUFBTSxDQUFDLEtBQUssQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQyxFQUFFLENBQUMsWUFBWSxDQUFDLElBQUksQ0FBQyxDQUFDLFFBQVEsRUFBRSxDQUFDLENBQUM7SUFDN0QsQ0FBQztDQUFBO0FBTEQsNEJBS0M7QUFFRCxxQkFBa0MsT0FBTzs7UUFDdkMsTUFBTSxLQUFLLEdBQUcsTUFBTSxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUM7UUFDdEMsTUFBTSxDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUMsQ0FBQyxJQUFJLEVBQUUsSUFBSSxFQUFFLEVBQUU7WUFDakMsTUFBTSxDQUFDLElBQUksR0FBRyxJQUFJLEdBQUcsSUFBSSxDQUFDO1FBQzVCLENBQUMsRUFBRSxFQUFFLENBQUMsQ0FBQztJQUNULENBQUM7Q0FBQTtBQUxELGtDQUtDO0FBRUQscUJBQWtDLFFBQVE7O1FBRXhDLE1BQU0sQ0FBQyxDQUFDLElBQUksT0FBTyxDQUE4QixDQUFDLE9BQU8sRUFBRSxNQUFNLEVBQUUsRUFBRTtZQUNuRSxJQUFJLFFBQVEsQ0FBQztZQUNiLEVBQUUsQ0FBQyxNQUFNLEVBQUUsQ0FBQyxLQUFLLENBQUMsUUFBUSxFQUFFLENBQUMsS0FBSyxFQUFFLE1BQU0sRUFBRSxDQUFDLEVBQUUsRUFBRTtnQkFDL0MsRUFBRSxDQUFDLENBQUMsS0FB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
+exports.graphToTS = graphToTS;
