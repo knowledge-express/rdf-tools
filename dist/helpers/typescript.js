@@ -11,11 +11,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
 const formatter = require("typescript-formatter");
 const nativeTypeMap = {
-    boolean: {
-        'http://www.w3.org/2001/XMLSchema#boolean': true,
-    },
+    boolean: {},
     string: {
-        'http://www.w3.org/2001/XMLSchema#string': true,
         'http://www.w3.org/2001/XMLSchema#duration': true,
     },
     number: {
@@ -28,18 +25,19 @@ function typeForIris(iris) {
         throw new Error('No type for empty iris.');
     if (iris.length === 1) {
         const [iri] = iris;
-        if (iri in nativeTypeMap.boolean)
-            return 'boolean';
-        if (iri in nativeTypeMap.number)
-            return 'number';
-        if (iri in nativeTypeMap.string)
-            return 'string';
         return semtools.getLocalName(iri);
     }
     const [first, ...rest] = iris;
     return `(${typeForIris([first])} & ${typeForIris(rest)})`;
 }
 exports.typeForIris = typeForIris;
+function nativeTypesToTS() {
+    return Object.keys(nativeTypeMap).map(nativeType => {
+        const iris = Object.keys(nativeTypeMap[nativeType]);
+        return iris.map(iri => `export type ${typeForIris([iri])} = ${nativeType};`).join('\n');
+    }).join('\n');
+}
+exports.nativeTypesToTS = nativeTypesToTS;
 function propertyToTS(propertyObj) {
     const name = semtools.getLocalName(propertyObj.iri);
     const type = typeForIris(propertyObj.range);
@@ -51,16 +49,16 @@ function classToTS(classObj, classIris = []) {
     const name = semtools.getLocalName(classObj.iri);
     const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
     const superTypes = existingSuperClasses.length === 0 ? '' : `${typeForIris(existingSuperClasses)} &`;
-    return `
-  export type ${name} = ${superTypes} {
+    return `export type ${name} = ${superTypes} {
     ${classObj.properties.map(propertyToTS).join('\n')}
   };
   `;
 }
 exports.classToTS = classToTS;
 function classesToTS(classesObj) {
+    const nativeTypeTS = nativeTypesToTS();
     const iris = classesObj.classes.map(c => c.iri);
-    return classesObj.classes.map(c => classToTS(c, iris)).join('\n');
+    return nativeTypeTS + '\n' + classesObj.classes.map(c => classToTS(c, iris)).join('\n');
 }
 exports.classesToTS = classesToTS;
 function objectToTSModule(obj) {
@@ -88,7 +86,7 @@ function literalsToTS({ literals }) {
 }
 exports.literalsToTS = literalsToTS;
 function defaultExportsToTS(defaultExports) {
-    return `\n\nexport default {\n${defaultExports.join(',\n')}\n};`;
+    return `export default {\n${defaultExports.join(',\n')}};`;
 }
 exports.defaultExportsToTS = defaultExportsToTS;
 exports.formatterOptions = {

@@ -9,7 +9,7 @@ export async function getIRIs(ontology): Promise<{ exports: string[], iris: Obje
   const { prefixes } = await getPrefixes(ontology);
   const prefixMap = Helpers.invertObject(prefixes);
 
-  const graph = triples.reduce((memo, triple) => {
+  const iris = triples.reduce((memo, triple) => {
     const { subject, predicate, object } = triple;
     return [ ...memo, subject, predicate, object];
   }, []).reduce((memo, maybeIri) => {
@@ -18,7 +18,6 @@ export async function getIRIs(ontology): Promise<{ exports: string[], iris: Obje
     const prefix = semtools.getNamespace(maybeIri);
     const localName = semtools.getLocalName(maybeIri);
     const prefixLocalName = prefixMap[prefix];
-    // console.log('Prefix and localname:', prefix, localName);
 
     if (!(prefixLocalName in memo)) memo[prefixLocalName] = {};
     memo[prefixLocalName][localName] = maybeIri;
@@ -28,6 +27,6 @@ export async function getIRIs(ontology): Promise<{ exports: string[], iris: Obje
 
   return {
     exports: [ 'iris' ],
-    iris: graph
+    iris: iris
   };
 }
