@@ -3,12 +3,13 @@ import * as formatter from 'typescript-formatter';
 
 import { Property, Class } from '../classes';
 
+// Mappings with the same local name should be avoid as they attempt to alias the native type with itself
 const nativeTypeMap = {
   boolean: {
-    'http://www.w3.org/2001/XMLSchema#boolean': true,
+    // 'http://www.w3.org/2001/XMLSchema#boolean': true,
   },
   string: {
-    'http://www.w3.org/2001/XMLSchema#string': true,
+    // 'http://www.w3.org/2001/XMLSchema#string': true,
     'http://www.w3.org/2001/XMLSchema#duration': true,
   },
   number: {
@@ -20,16 +21,19 @@ const nativeTypeMap = {
 export function typeForIris(iris: string[]): string {
   if (iris.length === 0) throw new Error('No type for empty iris.');
   if (iris.length === 1) {
-    // TODO: Map literal types to native JS types
     const [ iri ] = iris;
-    if (iri in nativeTypeMap.boolean) return 'boolean';
-    if (iri in nativeTypeMap.number)  return 'number';
-    if (iri in nativeTypeMap.string)  return 'string';
     return semtools.getLocalName(iri);
   }
 
   const [ first, ...rest ] = iris;
   return `(${typeForIris([ first ])} & ${typeForIris(rest)})`;
+}
+
+export function nativeTypesToTS() {
+  return Object.keys(nativeTypeMap).map(nativeType => {
+    const iris = Object.keys(nativeTypeMap[nativeType]);
+    return iris.map(iri => `export type ${typeForIris([ iri ])} = ${nativeType};`).join('\n')
+  }).join('\n');
 }
 
 export function propertyToTS(propertyObj: Property): string {
@@ -45,16 +49,16 @@ export function classToTS(classObj: Class, classIris: string[] = []): string {
   const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
   const superTypes = existingSuperClasses.length === 0 ? '' : `${typeForIris(existingSuperClasses)} &`;
 
-  return `
-  export type ${name} = ${superTypes} {
+  return `export type ${name} = ${superTypes} {
     ${classObj.properties.map(propertyToTS).join('\n')}
   };
   `;
 }
 
 export function classesToTS(classesObj: { classes: Class[] }): string {
+  const nativeTypeTS = nativeTypesToTS();
   const iris = classesObj.classes.map(c => c.iri);
-  return classesObj.classes.map(c => classToTS(c, iris)).join('\n');
+  return nativeTypeTS + '\n' + classesObj.classes.map(c => classToTS(c, iris)).join('\n');
 }
 
 export function objectToTSModule(obj): string {
@@ -63,6 +67,7 @@ export function objectToTSModule(obj): string {
     var str: string;
 
     if (typeof value === 'string') str = `\texport const ${key} = ${JSON.stringify(value)};\n`;
+    // else if (value instanceof Array) str = `export enum ${key} { }`;
     else str = `\nexport module ${key} { ${objectToTSModule(value)} };`;
 
     return memo + str;
@@ -82,7 +87,7 @@ export function literalsToTS({ literals }: { literals: string[] }): string {
 }
 
 export function defaultExportsToTS(defaultExports: string[]): string {
-  return `\n\nexport default {\n${defaultExports.join(',\n')}\n};`;
+  return `export default {\n${defaultExports.join(',\n')}};`;
 }
 
 export const formatterOptions = {

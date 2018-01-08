@@ -12,13 +12,21 @@ rdf-to-ts --help
 ```
 
 ```
-Usage: rdf-to-ts [options] <pattern>
+Usage: dist [options] <pattern>
+
+Generate TypeScript from RDF
 
 
 Options:
 
-  -V, --version  output the version number
-  -h, --help     output usage information
+  -V, --version          output the version number
+  -p, --prefixes         output prefixes
+  -i, --iris             output IRIs
+  -l, --literals         output literals
+  -c, --classes          output classes
+  -d, --default-exports  output default exports. Can only be used in combination with other flags
+  -D, --debug            output debug information
+  -h, --help             output usage information
 ```
 
 ## Example

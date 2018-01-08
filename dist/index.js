@@ -25,7 +25,7 @@ const defaultConfig = {
     classes: true,
     defaultExports: true,
 };
-function getConfig(config, defaultConfig) {
+function getConfig(config) {
     const { prefixes, iris, literals, classes, defaultExports } = config;
     if (!(prefixes || iris || literals || classes))
         return defaultConfig;
@@ -46,34 +46,41 @@ if (require.main === module) {
         .option('-l, --literals', 'output literals')
         .option('-c, --classes', 'output classes')
         .option('-d, --default-exports', 'output default exports. Can only be used in combination with other flags')
+        .option('-D, --debug', 'output debug information')
         .usage('[options] <pattern>');
     program.parse(process.argv);
+    const DEBUG = program.debug || false;
     (() => __awaiter(this, void 0, void 0, function* () {
         if (program.args.length === 0)
             throw new Error('You must enter a glob pattern.');
-        const config = getConfig(program, defaultConfig);
+        const config = getConfig(program);
         const glob = program.args;
         const ontology = yield Helpers.getOntology(glob);
-        let ts = '', prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null };
+        let ts = [], prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null };
         if (config.prefixes) {
             prefixes = yield prefixes_1.getPrefixes(ontology);
-            ts += Helpers.prefixesToTS(prefixes);
+            ts.push(Helpers.prefixesToTS(prefixes));
         }
         if (config.iris) {
             iris = yield iris_1.getIRIs(ontology);
-            ts += Helpers.IRIsToTS(iris);
+            ts.push(Helpers.IRIsToTS(iris));
         }
         if (config.classes) {
             classes = yield classes_1.getClasses(ontology);
-            ts += Helpers.classesToTS(classes);
+            ts.push(Helpers.classesToTS(classes));
         }
         if (config.defaultExports) {
             const defaultExports = [].concat(prefixes.exports, iris.exports, literals.exports, classes.exports);
-            ts += Helpers.defaultExportsToTS(defaultExports);
+            ts.push(Helpers.defaultExportsToTS(defaultExports));
         }
-        console.log(yield Helpers.formatTS(ts));
+        console.log(yield Helpers.formatTS(ts.join('\n')));
     }))().catch(err => {
-        console.error(err);
+        if (DEBUG)
+            console.error(err);
+        else {
+            console.error(`ERROR: ${err.message}`);
+            program.help();
+        }
         process.exit(1);
     });
     global["Knowledge"] = module.exports;
