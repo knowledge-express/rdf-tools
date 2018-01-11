@@ -7,6 +7,7 @@ import { getPrefixes } from './prefixes';
 import { getIRIs } from './iris';
 import { getLiterals } from './literals';
 import { getClasses } from './classes';
+import { getTypeGuards } from './type-guards';
 
 const Package = require('../package');
 
@@ -15,20 +16,13 @@ const defaultConfig = {
   iris: true,
   literals: true,
   classes: true,
+  typeGuards: true,
   defaultExports: true,
 };
 
 function getConfig(config) {
-  const { prefixes, iris, literals, classes, defaultExports } = config;
-  if (!(prefixes || iris || literals || classes)) return defaultConfig;
-
-  return {
-    prefixes,
-    iris,
-    literals,
-    classes,
-    defaultExports,
-  };
+  if (Object.keys(defaultConfig).reduce((memo, key) => (memo && !(key in config)), true)) return defaultConfig;
+  return config;
 }
 
 declare const require: any;
@@ -40,6 +34,7 @@ if (require.main === module) {
     .option('-i, --iris', 'output IRIs')
     .option('-l, --literals', 'output literals')
     .option('-c, --classes', 'output classes')
+    .option('-t, --type-guards', 'output type guards')
     .option('-d, --default-exports', 'output default exports. Can only be used in combination with other flags')
     .option('-D, --debug', 'output debug information')
     .usage('[options] <pattern>');
@@ -54,7 +49,12 @@ if (require.main === module) {
     const glob = program.args;
     const ontology = await Helpers.getOntology(glob);
 
-    let ts = [], prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null };
+    let ts = [],
+      prefixes = { exports: [], prefixes: null },
+      iris = { exports: [], iris: null },
+      literals = { exports: [], literals: null },
+      classes = { exports: [], classes: null },
+      typeGuards = { exports: [], typeGuards: null };
 
     if (config.prefixes) {
       prefixes = await getPrefixes(ontology);
@@ -75,6 +75,11 @@ if (require.main === module) {
     if (config.classes) {
       classes = await getClasses(ontology);
       ts.push(Helpers.classesToTS(classes));
+    }
+
+    if (config.typeGuards) {
+      typeGuards = await getTypeGuards(ontology);
+      ts.push(Helpers.typeGuardsToTS(typeGuards));
     }
 
     if (config.defaultExports) {

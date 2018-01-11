@@ -17,25 +17,20 @@ const Helpers = require("./helpers");
 const prefixes_1 = require("./prefixes");
 const iris_1 = require("./iris");
 const classes_1 = require("./classes");
+const type_guards_1 = require("./type-guards");
 const Package = require('../package');
 const defaultConfig = {
     prefixes: true,
     iris: true,
     literals: true,
     classes: true,
+    typeGuards: true,
     defaultExports: true,
 };
 function getConfig(config) {
-    const { prefixes, iris, literals, classes, defaultExports } = config;
-    if (!(prefixes || iris || literals || classes))
+    if (Object.keys(defaultConfig).reduce((memo, key) => (memo && !(key in config)), true))
         return defaultConfig;
-    return {
-        prefixes,
-        iris,
-        literals,
-        classes,
-        defaultExports,
-    };
+    return config;
 }
 if (require.main === module) {
     program
@@ -45,6 +40,7 @@ if (require.main === module) {
         .option('-i, --iris', 'output IRIs')
         .option('-l, --literals', 'output literals')
         .option('-c, --classes', 'output classes')
+        .option('-t, --type-guards', 'output type guards')
         .option('-d, --default-exports', 'output default exports. Can only be used in combination with other flags')
         .option('-D, --debug', 'output debug information')
         .usage('[options] <pattern>');
@@ -56,7 +52,7 @@ if (require.main === module) {
         const config = getConfig(program);
         const glob = program.args;
         const ontology = yield Helpers.getOntology(glob);
-        let ts = [], prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null };
+        let ts = [], prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null }, typeGuards = { exports: [], typeGuards: null };
         if (config.prefixes) {
             prefixes = yield prefixes_1.getPrefixes(ontology);
             ts.push(Helpers.prefixesToTS(prefixes));
@@ -68,6 +64,10 @@ if (require.main === module) {
         if (config.classes) {
             classes = yield classes_1.getClasses(ontology);
             ts.push(Helpers.classesToTS(classes));
+        }
+        if (config.typeGuards) {
+            typeGuards = yield type_guards_1.getTypeGuards(ontology);
+            ts.push(Helpers.typeGuardsToTS(typeGuards));
         }
         if (config.defaultExports) {
             const defaultExports = [].concat(prefixes.exports, iris.exports, literals.exports, classes.exports);

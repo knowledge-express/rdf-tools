@@ -41,11 +41,11 @@ exports.nativeTypesToTS = nativeTypesToTS;
 function propertyToTS(propertyObj) {
     const name = semtools.getLocalName(propertyObj.iri);
     const type = typeForIris(propertyObj.range);
-    const plurality = propertyObj.isFunctional ? '[]' : '';
+    const plurality = propertyObj.isFunctional ? '' : '[]';
     return `${name}: ${type}${plurality}`;
 }
 exports.propertyToTS = propertyToTS;
-function classToTS(classObj, classIris = []) {
+function classToTS(classObj, classIris) {
     const name = semtools.getLocalName(classObj.iri);
     const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
     const superTypes = existingSuperClasses.length === 0 ? '' : `${typeForIris(existingSuperClasses)} &`;
@@ -55,12 +55,76 @@ function classToTS(classObj, classIris = []) {
   `;
 }
 exports.classToTS = classToTS;
+function nativeTypesToTypeGuardTS() {
+    return Object.keys(nativeTypeMap).map(nativeType => {
+        const iris = Object.keys(nativeTypeMap[nativeType]);
+        return iris.map(iri => {
+            const typeName = typeForIris([iri]);
+            const typeGuardName = getTypeGuardName(typeName);
+            return `export function ${typeGuardName}(obj: any): obj is ${typeName} {
+        return typeof obj === "${nativeType}";
+      }`;
+        }).join('\n');
+    }).join('\n');
+}
+exports.nativeTypesToTypeGuardTS = nativeTypesToTypeGuardTS;
+function getTypeGuardName(typeName) {
+    return `is${typeName[0].toUpperCase() + typeName.slice(1, typeName.length)}`;
+}
+exports.getTypeGuardName = getTypeGuardName;
+exports.defaultTypeGuardOptions = {
+    allowUndefinedProperties: true,
+    allowNullProperties: true,
+    propertyTypeCheckEnabled: false,
+};
+function classToTypeGuardTS(classObj, classIris, options = {}) {
+    const typeGuardOptions = Object.assign({}, exports.defaultTypeGuardOptions, options);
+    const typeName = semtools.getLocalName(classObj.iri);
+    const typeGuardName = getTypeGuardName(typeName);
+    function propertyToPredicate(propertyObj) {
+        const name = semtools.getLocalName(propertyObj.iri);
+        const type = typeForIris(propertyObj.range);
+        const isSingular = propertyObj.isFunctional;
+        const isNativetype = type in nativeTypeMap;
+        const keyCheck = `"${name}" in obj`;
+        const undefinedCheck = `obj["${name}"] !== undefined`;
+        const nullCheck = `obj["${name}"] !== null`;
+        const typeCheck = isNativetype ?
+            (isSingular ? `typeof obj["${name}"] === "${type}"` : `obj["${name}"] instanceof Array && obj["${name}"].reduce((memo, value) => typeof value === "${type}", true)`) :
+            (isSingular ? `${getTypeGuardName(type)}(obj["${name}"])` : `obj["${name}"] instanceof Array && obj["${name}"].reduce((memo, value) => ${getTypeGuardName(type)}(value), true)`);
+        const checks = [keyCheck];
+        if (!typeGuardOptions.allowUndefinedProperties)
+            checks.push(undefinedCheck);
+        if (!typeGuardOptions.allowNullProperties)
+            checks.push(nullCheck);
+        if (typeGuardOptions.propertyTypeCheckEnabled)
+            checks.push(typeCheck);
+        return `(${checks.join(' && ')})`;
+    }
+    function superClassToPredicate(superClassIRI) {
+        const name = semtools.getLocalName(superClassIRI);
+        return `${getTypeGuardName(name)}(obj)`;
+    }
+    const objExists = `obj != null`;
+    const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
+    const predicates = [].concat(objExists, existingSuperClasses.map(superClassToPredicate), classObj.properties.map(propertyToPredicate));
+    return `export function ${typeGuardName}(obj: any): obj is ${typeName} {
+    return ${predicates.join(' &&\n')};
+  }`;
+}
+exports.classToTypeGuardTS = classToTypeGuardTS;
 function classesToTS(classesObj) {
     const nativeTypeTS = nativeTypesToTS();
     const iris = classesObj.classes.map(c => c.iri);
     return nativeTypeTS + '\n' + classesObj.classes.map(c => classToTS(c, iris)).join('\n');
 }
 exports.classesToTS = classesToTS;
+function typeGuardsToTS(typeGuardsObj) {
+    const nativeTypesTypeGuardTS = nativeTypesToTypeGuardTS();
+    const iris = typeGuardsObj.typeGuards.map(c => c.iri);
+    return nativeTypesTypeGuardTS + '\n' + typeGuardsObj.typeGuards.map(c => classToTypeGuardTS(c, iris)).join('\n');
+}
+exports.typeGuardsToTS = typeGuardsToTS;
 function objectToTSModule(obj) {
     return Object.keys(obj).reduce((memo, key) => {
         const value = obj[key];
