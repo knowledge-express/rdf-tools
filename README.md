@@ -1,20 +1,20 @@
-# rdf-to-ts
-Generate TypeScript from RDF.
+# rdf-tools
+Tools for RDF.
 
 ## Installation
 ```
-npm install -g rdf-to-ts
+npm install -g rdf-tools
 ```
 
 ## Usage
 ```
-rdf-to-ts --help
+rdf-tools --help
 ```
 
 ```
-Usage: dist [options] <pattern>
+Usage: rdf-tools [options] <pattern>
 
-Generate TypeScript from RDF
+Tools for RDF
 
 
 Options:
@@ -24,6 +24,7 @@ Options:
   -i, --iris             output IRIs
   -l, --literals         output literals
   -c, --classes          output classes
+  -t, --type-guards      output type guards
   -d, --default-exports  output default exports. Can only be used in combination with other flags
   -D, --debug            output debug information
   -h, --help             output usage information
@@ -32,7 +33,7 @@ Options:
 ## Example
 The following command will output types for all classes explicitly defined in the ontology, as well as an object containing the prefixes and IRIs used by the ontology.
 ```
-rdf-to-ts example.ttl > example.ts
+rdf-tools example.ttl > example.ts
 ```
 
 ## How does it work?
