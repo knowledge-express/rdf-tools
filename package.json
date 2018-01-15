@@ -1,11 +1,11 @@
 {
-  "name": "rdf-to-ts",
+  "name": "rdf-tools",
   "version": "0.3.0",
   "main": "dist/index.js",
   "author": "Steffan Sluis <steffansluis@gmail.com>",
   "license": "MIT",
   "bin": {
-    "rdf-to-ts": "dist/index.js"
+    "rdf-tools": "dist/index.js"
   },
   "scripts": {
     "dist": "tsc",
@@ -61,6 +61,6 @@
     "node": ">= 8",
     "npm": ">= 5"
   },
-  "description": "Generate TypeScript from RDF",
-  "repository": "git@github.com:knowledge-express/rdf-to-ts.git"
+  "description": "Tools for RDF",
+  "repository": "git@github.com:knowledge-express/rdf-tools.git"
 }
