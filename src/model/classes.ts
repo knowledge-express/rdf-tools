@@ -1,6 +1,6 @@
 const semtools = require('semantic-toolkit');
 
-import * as Helpers from './helpers';
+import * as Helpers from '../helpers';
 
 export type Property = {
   iri: string,
@@ -11,6 +11,7 @@ export type Property = {
 export type Class = {
   iri: string,
   superClasses: Array<string>,
+  subClasses: Array<string>,
   properties: Array<Property>
 }
 
@@ -26,11 +27,13 @@ export function expandProperty(graph, iri: string): Object {
 }
 
 export function expandClass(graph, iri: string): Object {
+  const subClasses = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', iri).map(t => t.subject);
   const superClasses = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', null).map(t => t.object);
   const properties = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#domain', iri).map(t => t.subject).map(p => expandProperty(graph, p));
 
   return {
     iri,
+    subClasses,
     superClasses,
     properties,
   };

@@ -8,17 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const semtools = require('semantic-toolkit');
-const classes_1 = require("./classes");
-const Helpers = require("./helpers");
-function getTypeGuards(ontology) {
+const formatter = require("typescript-formatter");
+exports.formatterOptions = {
+    replace: false,
+    verify: false,
+    tsconfig: false,
+    tsconfigFile: null,
+    tslint: false,
+    tslintFile: null,
+    editorconfig: false,
+    vscode: false,
+    vscodeFile: null,
+    tsfmt: false,
+    tsfmtFile: null
+};
+function formatTS(ts, options = exports.formatterOptions) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { classes } = yield classes_1.getClasses(ontology);
-        const typeGuardNames = classes.map(c => Helpers.typeForIris([c.iri])).map(Helpers.getTypeGuardName);
-        return {
-            exports: typeGuardNames,
-            typeGuards: classes
-        };
+        return (yield formatter.processString('', ts, exports.formatterOptions)).dest;
     });
 }
-exports.getTypeGuards = getTypeGuards;
+exports.formatTS = formatTS;

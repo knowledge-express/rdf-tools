@@ -13,25 +13,10 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const program = require("commander");
+const Model = require("./model");
 const Helpers = require("./helpers");
-const prefixes_1 = require("./prefixes");
-const iris_1 = require("./iris");
-const classes_1 = require("./classes");
-const type_guards_1 = require("./type-guards");
+const TS = require("./typescript");
 const Package = require('../package');
-const defaultConfig = {
-    prefixes: true,
-    iris: true,
-    literals: true,
-    classes: true,
-    typeGuards: true,
-    defaultExports: true,
-};
-function getConfig(config) {
-    if (Object.keys(defaultConfig).reduce((memo, key) => (memo && !(key in config)), true))
-        return defaultConfig;
-    return config;
-}
 if (require.main === module) {
     program
         .version(Package.version)
@@ -49,31 +34,31 @@ if (require.main === module) {
     (() => __awaiter(this, void 0, void 0, function* () {
         if (program.args.length === 0)
             throw new Error('You must enter a glob pattern.');
-        const config = getConfig(program);
+        const config = Helpers.getConfig(program);
         const glob = program.args;
         const ontology = yield Helpers.getOntology(glob);
         let ts = [], prefixes = { exports: [], prefixes: null }, iris = { exports: [], iris: null }, literals = { exports: [], literals: null }, classes = { exports: [], classes: null }, typeGuards = { exports: [], typeGuards: null };
         if (config.prefixes) {
-            prefixes = yield prefixes_1.getPrefixes(ontology);
-            ts.push(Helpers.prefixesToTS(prefixes));
+            prefixes = yield Model.getPrefixes(ontology);
+            ts.push(TS.prefixesToTS(prefixes));
         }
         if (config.iris) {
-            iris = yield iris_1.getIRIs(ontology);
-            ts.push(Helpers.IRIsToTS(iris));
+            iris = yield Model.getIRIs(ontology);
+            ts.push(TS.IRIsToTS(iris));
         }
         if (config.classes) {
-            classes = yield classes_1.getClasses(ontology);
-            ts.push(Helpers.classesToTS(classes));
+            classes = yield Model.getClasses(ontology);
+            ts.push(TS.classesToTS(classes));
         }
         if (config.typeGuards) {
-            typeGuards = yield type_guards_1.getTypeGuards(ontology);
-            ts.push(Helpers.typeGuardsToTS(typeGuards));
+            typeGuards = yield Model.getTypeGuards(ontology);
+            ts.push(TS.typeGuardsToTS(typeGuards));
         }
         if (config.defaultExports) {
             const defaultExports = [].concat(prefixes.exports, iris.exports, literals.exports, classes.exports);
-            ts.push(Helpers.defaultExportsToTS(defaultExports));
+            ts.push(TS.defaultExportsToTS(defaultExports));
         }
-        console.log(yield Helpers.formatTS(ts.join('\n')));
+        console.log(yield TS.formatTS(ts.join('\n')));
     }))().catch(err => {
         if (DEBUG)
             console.error(err);
@@ -86,3 +71,5 @@ if (require.main === module) {
     global["Knowledge"] = module.exports;
 }
 __export(require("./helpers"));
+__export(require("./model"));
+__export(require("./typescript"));

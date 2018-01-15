@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
-const Helpers = require("./helpers");
+const Helpers = require("../helpers");
 function expandProperty(graph, iri) {
     const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).map(t => t.object);
     const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#FunctionalProperty').length > 0;
@@ -21,10 +21,12 @@ function expandProperty(graph, iri) {
 }
 exports.expandProperty = expandProperty;
 function expandClass(graph, iri) {
+    const subClasses = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', iri).map(t => t.subject);
     const superClasses = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', null).map(t => t.object);
     const properties = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#domain', iri).map(t => t.subject).map(p => expandProperty(graph, p));
     return {
         iri,
+        subClasses,
         superClasses,
         properties,
     };

@@ -6,6 +6,7 @@ export declare type Property = {
 export declare type Class = {
     iri: string;
     superClasses: Array<string>;
+    subClasses: Array<string>;
     properties: Array<Property>;
 };
 export declare function expandProperty(graph: any, iri: string): Object;

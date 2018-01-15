@@ -1,7 +1,7 @@
 const semtools = require('semantic-toolkit');
 
 import { getPrefixes } from './prefixes';
-import * as Helpers from './helpers';
+import * as Helpers from '../helpers';
 
 // TODO: Literals
 export async function getIRIs(ontology): Promise<{ exports: string[], iris: Object }> {

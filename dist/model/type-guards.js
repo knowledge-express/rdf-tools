@@ -9,23 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
-const Helpers = require("./helpers");
-function getLiterals(ontology) {
+const classes_1 = require("./classes");
+const TS = require("../typescript");
+function getTypeGuards(ontology) {
     return __awaiter(this, void 0, void 0, function* () {
-        const triples = Helpers.getTriples(ontology);
-        const literals = triples.reduce((memo, triple) => {
-            const { subject, predicate, object } = triple;
-            return [...memo, subject, predicate, object];
-        }, []).reduce((memo, maybeLiteral) => {
-            if (semtools.isIri(maybeLiteral))
-                return memo;
-            memo[maybeLiteral] = maybeLiteral;
-            return memo;
-        }, {});
+        const { classes } = yield classes_1.getClasses(ontology);
+        const typeGuardNames = classes.map(c => TS.typeForIris([c.iri])).map(TS.getTypeGuardName);
         return {
-            exports: ['literals'],
-            literals
+            exports: typeGuardNames,
+            typeGuards: classes
         };
     });
 }
-exports.getLiterals = getLiterals;
+exports.getTypeGuards = getTypeGuards;
