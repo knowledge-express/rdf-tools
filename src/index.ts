@@ -2,28 +2,11 @@
 
 import * as program from 'commander';
 
+import * as Model from './model';
 import * as Helpers from './helpers';
-import { getPrefixes } from './prefixes';
-import { getIRIs } from './iris';
-import { getLiterals } from './literals';
-import { getClasses } from './classes';
-import { getTypeGuards } from './type-guards';
+import * as TS from './typescript';
 
 const Package = require('../package');
-
-const defaultConfig = {
-  prefixes: true,
-  iris: true,
-  literals: true,
-  classes: true,
-  typeGuards: true,
-  defaultExports: true,
-};
-
-function getConfig(config) {
-  if (Object.keys(defaultConfig).reduce((memo, key) => (memo && !(key in config)), true)) return defaultConfig;
-  return config;
-}
 
 declare const require: any;
 if (require.main === module) {
@@ -44,7 +27,7 @@ if (require.main === module) {
 
   (async () => {
     if (program.args.length === 0) throw new Error('You must enter a glob pattern.');
-    const config = getConfig(program);
+    const config = Helpers.getConfig(<Helpers.Config>program);
 
     const glob = program.args;
     const ontology = await Helpers.getOntology(glob);
@@ -57,37 +40,37 @@ if (require.main === module) {
       typeGuards = { exports: [], typeGuards: null };
 
     if (config.prefixes) {
-      prefixes = await getPrefixes(ontology);
-      ts.push(Helpers.prefixesToTS(prefixes));
+      prefixes = await Model.getPrefixes(ontology);
+      ts.push(TS.prefixesToTS(prefixes));
     }
 
     if (config.iris) {
-      iris = await getIRIs(ontology);
-      ts.push(Helpers.IRIsToTS(iris));
+      iris = await Model.getIRIs(ontology);
+      ts.push(TS.IRIsToTS(iris));
     }
 
     // TODO: This is disabled until we figure out how to expose literals in TS
     // if (config.literals) {
-    //   literals = await getLiterals(ontology);
-    //   ts.push(Helpers.literalsToTS(literals));
+    //   literals = await Model.getLiterals(ontology);
+    //   ts.push(TS.literalsToTS(literals));
     // }
 
     if (config.classes) {
-      classes = await getClasses(ontology);
-      ts.push(Helpers.classesToTS(classes));
+      classes = await Model.getClasses(ontology);
+      ts.push(TS.classesToTS(classes));
     }
 
     if (config.typeGuards) {
-      typeGuards = await getTypeGuards(ontology);
-      ts.push(Helpers.typeGuardsToTS(typeGuards));
+      typeGuards = await Model.getTypeGuards(ontology);
+      ts.push(TS.typeGuardsToTS(typeGuards));
     }
 
     if (config.defaultExports) {
       const defaultExports = [].concat(prefixes.exports, iris.exports, literals.exports, classes.exports);
-      ts.push(Helpers.defaultExportsToTS(defaultExports));
+      ts.push(TS.defaultExportsToTS(defaultExports));
     }
 
-    console.log(await Helpers.formatTS(ts.join('\n')));
+    console.log(await TS.formatTS(ts.join('\n')));
   })().catch(err => {
     if (DEBUG) console.error(err);
     else {
@@ -102,3 +85,5 @@ if (require.main === module) {
 }
 
 export * from './helpers';
+export * from './model';
+export * from './typescript';

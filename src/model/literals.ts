@@ -1,6 +1,6 @@
 const semtools = require('semantic-toolkit');
 
-import * as Helpers from './helpers';
+import * as Helpers from '../helpers';
 
 // TODO: Figure out how to deal with literals
 export async function getLiterals(ontology): Promise<{ exports: string[], literals: Object }> {

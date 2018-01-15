@@ -10,13 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
 const prefixes_1 = require("./prefixes");
-const Helpers = require("./helpers");
+const Helpers = require("../helpers");
 function getIRIs(ontology) {
     return __awaiter(this, void 0, void 0, function* () {
         const triples = Helpers.getTriples(ontology);
         const { prefixes } = yield prefixes_1.getPrefixes(ontology);
         const prefixMap = Helpers.invertObject(prefixes);
-        const graph = triples.reduce((memo, triple) => {
+        const iris = triples.reduce((memo, triple) => {
             const { subject, predicate, object } = triple;
             return [...memo, subject, predicate, object];
         }, []).reduce((memo, maybeIri) => {
@@ -32,7 +32,7 @@ function getIRIs(ontology) {
         }, {});
         return {
             exports: ['iris'],
-            iris: graph
+            iris: iris
         };
     });
 }
