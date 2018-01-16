@@ -20,6 +20,7 @@ export declare function literalsToTS({literals}: {
     literals: string[];
 }): string;
 export declare function defaultExportsToTS(defaultExports: string[]): string;
+export * from './command';
 export * from './format';
 export * from './type-guards';
 export * from './types';

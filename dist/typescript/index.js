@@ -53,6 +53,7 @@ function defaultExportsToTS(defaultExports) {
     return `export default {\n${defaultExports.join(',\n')}};`;
 }
 exports.defaultExportsToTS = defaultExportsToTS;
+__export(require("./command"));
 __export(require("./format"));
 __export(require("./type-guards"));
 __export(require("./types"));

@@ -54,6 +54,7 @@ export function defaultExportsToTS(defaultExports: string[]): string {
   return `export default {\n${defaultExports.join(',\n')}};`;
 }
 
+export * from './command';
 export * from './format';
 export * from './type-guards';
 export * from './types';

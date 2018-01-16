@@ -44,7 +44,7 @@
   dependencies:
     arrify "^1.0.1"
 
-"@types/commander@^2.11.0", "@types/commander@^2.12.2":
+"@types/commander@^2.11.0":
   version "2.12.2"
   resolved "https://registry.yarnpkg.com/@types/commander/-/commander-2.12.2.tgz#183041a23842d4281478fa5d23c5ca78e6fd08ae"
   dependencies:
@@ -85,6 +85,10 @@
 "@types/semver@^5.4.0":
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-5.4.0.tgz#f3658535af7f1f502acd6da7daf405ffeb1f7ee4"
+
+"@types/yargs@^10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-10.0.1.tgz#f986e2b5d37f1fb8c13c0ed15f45d01bcc3fb3d6"
 
 abbrev@1:
   version "1.1.1"
@@ -1106,7 +1110,7 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@*, commander@^2.11.0, commander@^2.12.2:
+commander@*, commander@^2.11.0:
   version "2.12.2"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.12.2.tgz#0f5946c427ed9ec0d91a46bb9def53e54650e555"
 
@@ -3701,6 +3705,23 @@ yargs-parser@^8.0.0, yargs-parser@^8.1.0:
 yargs@^10.0.3:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-10.1.0.tgz#85d98f2264c7487f18c4607b79c7e4e3b160e69e"
+  dependencies:
+    cliui "^4.0.0"
+    decamelize "^1.1.1"
+    find-up "^2.1.0"
+    get-caller-file "^1.0.1"
+    os-locale "^2.0.0"
+    require-directory "^2.1.1"
+    require-main-filename "^1.0.1"
+    set-blocking "^2.0.0"
+    string-width "^2.0.0"
+    which-module "^2.0.0"
+    y18n "^3.2.1"
+    yargs-parser "^8.1.0"
+
+yargs@^10.1.1:
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-10.1.1.tgz#5fe1ea306985a099b33492001fa19a1e61efe285"
   dependencies:
     cliui "^4.0.0"
     decamelize "^1.1.1"

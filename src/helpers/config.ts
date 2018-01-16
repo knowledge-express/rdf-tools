@@ -16,11 +16,11 @@ export function getConfig(config: Config): Config {
   // if (Object.keys(defaultConfig).reduce((memo, key) => (memo && !(key in config)), true)) return defaultConfig;
   // Default exports is not a valid option by itself, which is why the above statement is not used
   if (!(
-    'prefixes'    in config ||
-    'iris'        in config ||
+    config['prefixes'] || //    in config ||
+    config['iris'] || //        in config ||
     // 'literals'    in config ||
-    'classes'     in config ||
-    'typeGuards'  in config
+    config['classes'] || //     in config ||
+    config['typeGuards'] //  in config
   )) return defaultConfig;
 
   return config;
