@@ -9,10 +9,10 @@ exports.defaultConfig = {
     defaultExports: true,
 };
 function getConfig(config) {
-    if (!('prefixes' in config ||
-        'iris' in config ||
-        'classes' in config ||
-        'typeGuards' in config))
+    if (!(config['prefixes'] ||
+        config['iris'] ||
+        config['classes'] ||
+        config['typeGuards']))
         return exports.defaultConfig;
     return config;
 }
