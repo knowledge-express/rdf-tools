@@ -54,6 +54,7 @@ function defaultExportsToTS(defaultExports) {
 }
 exports.defaultExportsToTS = defaultExportsToTS;
 __export(require("./command"));
+__export(require("./config"));
 __export(require("./format"));
 __export(require("./type-guards"));
 __export(require("./types"));

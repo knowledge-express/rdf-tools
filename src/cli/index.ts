@@ -1,6 +1,7 @@
 import * as yargs from 'yargs';
 
 import { builder as buildTS } from './typescript';
+import { builder as buildLD } from './jsonld';
 
 const Package = require('../../package');
 
@@ -40,4 +41,4 @@ export const build = args => args
     .wrap(100);
     // .fail(handleError)
 
-export const argv = compose(build, buildTS)(yargs).argv;
+export const argv = compose(build, buildTS, buildLD)(yargs).argv;

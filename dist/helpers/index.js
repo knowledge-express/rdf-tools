@@ -12,7 +12,6 @@ function invertObject(obj) {
     }, {});
 }
 exports.invertObject = invertObject;
-__export(require("./config"));
 __export(require("./graph"));
 __export(require("./ontology"));
 __export(require("./triples"));

@@ -8,13 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typescript_1 = require("../typescript");
-const helpers_1 = require("../helpers");
+const TS = require("../typescript");
 function handleTypescript(argv) {
     return __awaiter(this, void 0, void 0, function* () {
         const pattern = argv.pattern;
-        const config = helpers_1.getConfig(argv);
-        const output = yield typescript_1.handleCommand(pattern, config);
+        const config = TS.getConfig(argv);
+        const output = yield TS.handleCommand(pattern, config);
         console.log(output);
     });
 }

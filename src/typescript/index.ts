@@ -55,6 +55,7 @@ export function defaultExportsToTS(defaultExports: string[]): string {
 }
 
 export * from './command';
+export * from './config';
 export * from './format';
 export * from './type-guards';
 export * from './types';
