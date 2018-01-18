@@ -2,7 +2,7 @@ import * as Model from '../model';
 import * as Helpers from '../helpers';
 import * as TS from '.';
 
-export async function handleCommand(glob: string, config: Helpers.Config) {
+export async function handleCommand(glob: string, config: TS.Config) {
   if (glob == null) throw new Error('You must enter a glob pattern.');
   const ontology = await Helpers.getOntology(glob);
 

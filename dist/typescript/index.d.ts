@@ -21,6 +21,7 @@ export declare function literalsToTS({literals}: {
 }): string;
 export declare function defaultExportsToTS(defaultExports: string[]): string;
 export * from './command';
+export * from './config';
 export * from './format';
 export * from './type-guards';
 export * from './types';

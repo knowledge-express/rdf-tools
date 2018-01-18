@@ -1,14 +1,13 @@
 import * as yargs from 'yargs';
 
-import { handleCommand } from '../typescript';
-import { getConfig } from '../helpers';
+import * as TS from '../typescript';
 
 export async function handleTypescript(argv) {
   const pattern = argv.pattern;
-  const config = getConfig(argv);
+  const config = TS.getConfig(argv);
   // console.log(pattern, config);
 
-  const output = await handleCommand(pattern, config);
+  const output = await TS.handleCommand(pattern, config);
   console.log(output);
 }
 

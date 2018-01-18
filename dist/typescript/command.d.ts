@@ -1,2 +1,2 @@
-import * as Helpers from '../helpers';
-export declare function handleCommand(glob: string, config: Helpers.Config): Promise<string>;
+import * as TS from '.';
+export declare function handleCommand(glob: string, config: TS.Config): Promise<string>;
