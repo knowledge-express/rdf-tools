@@ -13,8 +13,9 @@ export async function handleCommand(glob: string, config: LD.Config) {
   let ld: LD = {};
 
   if (config.context) {
-    const { iris } = await Model.getIRIs(ontology);
-    ld['@context'] = LD.getContext(iris);
+    const { prefixes } = await Model.getPrefixes(ontology);
+    const { classes } = await Model.getClasses(ontology);
+    ld['@context'] = LD.getContext(prefixes, classes);
   }
 
   return LD.formatLD(ld);

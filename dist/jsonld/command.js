@@ -18,8 +18,9 @@ function handleCommand(glob, config) {
         const ontology = yield Helpers.getOntology(glob);
         let ld = {};
         if (config.context) {
-            const { iris } = yield Model.getIRIs(ontology);
-            ld['@context'] = LD.getContext(iris);
+            const { prefixes } = yield Model.getPrefixes(ontology);
+            const { classes } = yield Model.getClasses(ontology);
+            ld['@context'] = LD.getContext(prefixes, classes);
         }
         return LD.formatLD(ld);
     });
