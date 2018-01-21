@@ -1,6 +1,3 @@
-export declare function getContext(iris: Object): {
-    bla: number;
-    blabla: {
-        iris: Object;
-    };
-};
+import { Class } from '../model';
+export declare function classToContextByPrefix(classObj: Class): {};
+export declare function getContext(prefixes: Object, classes: Class[]): any[];
