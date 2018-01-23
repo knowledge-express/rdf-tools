@@ -4,8 +4,6 @@ import { build } from './cli';
 
 declare const require: any;
 if (require.main === module) {
-  console.log('Running as script.');
-
   // This actually initializes the CLI. Doing '.argv' is also needed 
   build(yargs).argv;
 }

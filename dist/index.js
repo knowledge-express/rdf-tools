@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const yargs = require("yargs");
 const cli_1 = require("./cli");
 if (require.main === module) {
-    console.log('Running as script.');
     cli_1.build(yargs).argv;
 }
 __export(require("./cli"));
