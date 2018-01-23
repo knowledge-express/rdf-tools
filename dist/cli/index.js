@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const yargs = require("yargs");
 const typescript_1 = require("./typescript");
 const jsonld_1 = require("./jsonld");
 const Package = require('../../package');
@@ -11,7 +10,7 @@ function compose(builder, ...otherBuilders) {
     return (...args) => otherBuilder(builder(...args));
 }
 exports.compose = compose;
-exports.build = args => args
+exports.buildMain = (args) => args
     .usage('Usage: $0 <command> [options] <pattern>')
     .version(Package.version)
     .alias('v', 'version')
@@ -22,4 +21,4 @@ exports.build = args => args
     .alias('h', 'help')
     .epilog('Happy coding!')
     .wrap(100);
-exports.argv = compose(exports.build, typescript_1.builder, jsonld_1.builder)(yargs).argv;
+exports.build = compose(exports.buildMain, typescript_1.builder, jsonld_1.builder);

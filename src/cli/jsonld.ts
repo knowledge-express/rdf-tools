@@ -11,7 +11,7 @@ export async function handleJSONLD(argv) {
   console.log(output);
 }
 
-export const builder = args => args.command([ 'jsonld [options] <pattern>', 'ld' ], 'generate JSON-LD from RDF', (args) => {
+export const builder = (args: typeof yargs) => args.command([ 'jsonld [options] <pattern>', 'ld' ], 'generate JSON-LD from RDF', (args) => {
   return args
     .option('c', {
       desc: 'output context',

@@ -11,7 +11,7 @@ export async function handleTypescript(argv) {
   console.log(output);
 }
 
-export const builder = args => args.command([ 'typescript [options] <pattern>', 'ts' ], 'generate TypeScript from RDF', (args) => {
+export const builder = (args: typeof yargs) => args.command([ 'typescript [options] <pattern>', 'ts' ], 'generate TypeScript from RDF', (args) => {
   return args
     .option('p', {
       desc: 'output prefixes',

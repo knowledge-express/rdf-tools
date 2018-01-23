@@ -1,16 +1,14 @@
 #!/usr/bin/env node
+import * as yargs from 'yargs';
+import { build } from './cli';
 
-import * as Model from './model';
-import * as Helpers from './helpers';
-import * as TS from './typescript';
+declare const require: any;
+if (require.main === module) {
+  console.log('Running as script.');
 
-const Package = require('../package');
-//
-// declare const require: any;
-// if (require.main === module) {
-//
-//   global["Knowledge"] = module.exports;
-// }
+  // This actually initializes the CLI. Doing '.argv' is also needed 
+  build(yargs).argv;
+}
 
 export * from './cli';
 

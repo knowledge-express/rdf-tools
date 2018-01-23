@@ -1,5 +1,4 @@
 import * as yargs from 'yargs';
-
 import { builder as buildTS } from './typescript';
 import { builder as buildLD } from './jsonld';
 
@@ -28,7 +27,7 @@ export function compose(builder, ...otherBuilders) {
 //   process.exit(1);
 // }
 
-export const build = args => args
+export const buildMain = (args: typeof yargs) => args
     .usage('Usage: $0 <command> [options] <pattern>')
     .version(Package.version)
     .alias('v', 'version')
@@ -41,4 +40,4 @@ export const build = args => args
     .wrap(100);
     // .fail(handleError)
 
-export const argv = compose(build, buildTS, buildLD)(yargs).argv;
+export const build = compose(buildMain, buildTS, buildLD);

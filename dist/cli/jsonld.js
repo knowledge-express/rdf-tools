@@ -18,7 +18,7 @@ function handleJSONLD(argv) {
     });
 }
 exports.handleJSONLD = handleJSONLD;
-exports.builder = args => args.command(['jsonld [options] <pattern>', 'ld'], 'generate JSON-LD from RDF', (args) => {
+exports.builder = (args) => args.command(['jsonld [options] <pattern>', 'ld'], 'generate JSON-LD from RDF', (args) => {
     return args
         .option('c', {
         desc: 'output context',
