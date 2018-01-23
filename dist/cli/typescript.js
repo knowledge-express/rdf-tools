@@ -18,7 +18,7 @@ function handleTypescript(argv) {
     });
 }
 exports.handleTypescript = handleTypescript;
-exports.builder = args => args.command(['typescript [options] <pattern>', 'ts'], 'generate TypeScript from RDF', (args) => {
+exports.builder = (args) => args.command(['typescript [options] <pattern>', 'ts'], 'generate TypeScript from RDF', (args) => {
     return args
         .option('p', {
         desc: 'output prefixes',

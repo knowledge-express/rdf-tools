@@ -1,2 +1,3 @@
+import * as yargs from 'yargs';
 export declare function handleTypescript(argv: any): Promise<void>;
-export declare const builder: (args: any) => any;
+export declare const builder: (args: yargs.Argv) => yargs.Argv;
