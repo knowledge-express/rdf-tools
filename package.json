@@ -2,6 +2,7 @@
   "name": "rdf-tools",
   "version": "0.3.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Steffan Sluis <steffansluis@gmail.com>",
   "license": "MIT",
   "bin": {
@@ -11,7 +12,7 @@
     "dist": "tsc",
     "clean": "rm -rf dist",
     "pretest": "npm run clean && tsc --inlineSourceMap",
-    "test": "nyc ava",
+    "test": "nyc ava --verbose",
     "watch-test": "nodemon -w test -x 'npm run test'",
     "coverage": "codecov",
     "watch": "tsc --watch & nodemon; wait"
