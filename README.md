@@ -12,28 +12,24 @@ rdf-tools --help
 ```
 
 ```
-Usage: rdf-tools [options] <pattern>
+Usage: rdf-tools <command> [options] <pattern>
 
-Tools for RDF
-
+Commands:
+  rdf-tools typescript [options] <pattern>  generate TypeScript from RDF               [aliases: ts]
+  rdf-tools jsonld [options] <pattern>      generate JSON-LD from RDF                  [aliases: ld]
 
 Options:
+  -D, --debug    output debug information                                                  [boolean]
+  -h, --help     Show help                                                                 [boolean]
+  -v, --version  Show version number                                                       [boolean]
 
-  -V, --version          output the version number
-  -p, --prefixes         output prefixes
-  -i, --iris             output IRIs
-  -l, --literals         output literals
-  -c, --classes          output classes
-  -t, --type-guards      output type guards
-  -d, --default-exports  output default exports. Can only be used in combination with other flags
-  -D, --debug            output debug information
-  -h, --help             output usage information
+Happy coding!
 ```
 
 ## Example
 The following command will output types for all classes explicitly defined in the ontology, as well as an object containing the prefixes and IRIs used by the ontology.
 ```
-rdf-tools example.ttl > example.ts
+rdf-tools typescript example.ttl > example.ts
 ```
 
 ## How does it work?
