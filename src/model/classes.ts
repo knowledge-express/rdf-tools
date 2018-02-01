@@ -6,6 +6,7 @@ export type Property = {
   iri: string,
   range: string[],
   isFunctional: boolean
+  isNative: boolean
 }
 
 export type Class = {
@@ -15,14 +16,37 @@ export type Class = {
   properties: Array<Property>
 }
 
+export const nativeTypeMap = {
+  boolean: {
+    'http://www.w3.org/2001/XMLSchema#boolean': true,
+  },
+  string: {
+    'http://www.w3.org/2001/XMLSchema#string': true,
+    'http://www.w3.org/2001/XMLSchema#duration': true,
+  },
+  number: {
+    'http://www.w3.org/2001/XMLSchema#integer': true,
+    'http://www.w3.org/2001/XMLSchema#decimal': true,
+  },
+};
+
+export function isNativeType(iris: string[]): boolean {
+  // console.log(`Is native?`, iris);
+  return Object.keys(nativeTypeMap).reduce((memo, key) => {
+    return memo || iris.reduce((memo, iri) => iri in nativeTypeMap[key], memo);
+  }, false);
+}
 
 export function expandProperty(graph, iri: string): Object {
   const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).map(t => t.object);
   const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/2002/07/owl#FunctionalProperty').length > 0;
+  const isNative = isNativeType(range);
+
   return {
     iri,
     range,
-    isFunctional
+    isFunctional,
+    isNative
   };
 }
 

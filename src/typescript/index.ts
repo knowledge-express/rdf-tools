@@ -1,18 +1,6 @@
-const semtools = require('semantic-toolkit');
+import { nativeTypeMap } from '../model';
 
-export const nativeTypeMap = {
-  boolean: {
-    // 'http://www.w3.org/2001/XMLSchema#boolean': true,
-  },
-  string: {
-    // 'http://www.w3.org/2001/XMLSchema#string': true,
-    'http://www.w3.org/2001/XMLSchema#duration': true,
-  },
-  number: {
-    'http://www.w3.org/2001/XMLSchema#integer': true,
-    'http://www.w3.org/2001/XMLSchema#decimal': true,
-  },
-};
+const semtools = require('semantic-toolkit');
 
 export function typeForIris(iris: string[]): string {
   if (iris.length === 0) throw new Error('No type for empty iris.');

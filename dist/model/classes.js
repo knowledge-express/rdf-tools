@@ -10,13 +10,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
 const Helpers = require("../helpers");
+exports.nativeTypeMap = {
+    boolean: {
+        'http://www.w3.org/2001/XMLSchema#boolean': true,
+    },
+    string: {
+        'http://www.w3.org/2001/XMLSchema#string': true,
+        'http://www.w3.org/2001/XMLSchema#duration': true,
+    },
+    number: {
+        'http://www.w3.org/2001/XMLSchema#integer': true,
+        'http://www.w3.org/2001/XMLSchema#decimal': true,
+    },
+};
+function isNativeType(iris) {
+    return Object.keys(exports.nativeTypeMap).reduce((memo, key) => {
+        return memo || iris.reduce((memo, iri) => iri in exports.nativeTypeMap[key], memo);
+    }, false);
+}
+exports.isNativeType = isNativeType;
 function expandProperty(graph, iri) {
     const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).map(t => t.object);
     const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#FunctionalProperty').length > 0;
+    const isNative = isNativeType(range);
     return {
         iri,
         range,
-        isFunctional
+        isFunctional,
+        isNative
     };
 }
 exports.expandProperty = expandProperty;

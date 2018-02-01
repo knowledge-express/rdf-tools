@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
 const _1 = require(".");
+const model_1 = require("../model");
 function nativeTypesToTypeGuardTS() {
-    return Object.keys(_1.nativeTypeMap).map(nativeType => {
-        const iris = Object.keys(_1.nativeTypeMap[nativeType]);
+    return Object.keys(model_1.nativeTypeMap).map(nativeType => {
+        const iris = Object.keys(model_1.nativeTypeMap[nativeType]);
         return iris.map(iri => {
             const typeName = _1.typeForIris([iri]);
             const typeGuardName = getTypeGuardName(typeName);
@@ -31,7 +32,7 @@ function propertyToPredicate(propertyObj, options) {
     const name = semtools.getLocalName(propertyObj.iri);
     const type = _1.typeForIris(propertyObj.range);
     const isSingular = propertyObj.isFunctional;
-    const isNativetype = type in _1.nativeTypeMap;
+    const isNativetype = type in model_1.nativeTypeMap;
     const keyCheck = `"${name}" in obj`;
     const undefinedCheck = `obj["${name}"] !== undefined`;
     const nullCheck = `obj["${name}"] !== null`;

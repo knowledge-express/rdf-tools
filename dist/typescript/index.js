@@ -4,16 +4,6 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
-exports.nativeTypeMap = {
-    boolean: {},
-    string: {
-        'http://www.w3.org/2001/XMLSchema#duration': true,
-    },
-    number: {
-        'http://www.w3.org/2001/XMLSchema#integer': true,
-        'http://www.w3.org/2001/XMLSchema#decimal': true,
-    },
-};
 function typeForIris(iris) {
     if (iris.length === 0)
         throw new Error('No type for empty iris.');

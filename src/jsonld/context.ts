@@ -5,11 +5,11 @@ export function classToContextByPrefix(classObj: Class) {
   const contextsByPrefix = classObj.properties.reduce((memo, property) => {
     const prefix = semtools.getNamespace(property.iri);
     const name = semtools.getLocalName(property.iri);
-    const context = property.isFunctional ? property.iri : {
-      "@id": property.iri,
-      "@type": "@id",
-      "@container": "@set"
-    };
+
+    // console.log(`Property ${property.iri} is native? `, property.isNative);
+    const context = property.isNative ?
+      (property.isFunctional ? property.iri : { "@id": property.iri, "@container": "@set" }) :
+      (property.isFunctional ? { "@id": property.iri, "@type": "@id" } : { "@id": property.iri, "@type": "@id", "@container": "@set" });
 
     if (prefix in memo) memo[prefix][name] = context;
     else memo[prefix] = { [name]: context };

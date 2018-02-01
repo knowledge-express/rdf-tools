@@ -1,7 +1,7 @@
 const semtools = require('semantic-toolkit');
-import { typeForIris, nativeTypeMap } from '.';
+import { typeForIris } from '.';
 
-import { Property, Class } from '../model';
+import { Property, Class, nativeTypeMap } from '../model';
 
 export function nativeTypesToTypeGuardTS() {
   return Object.keys(nativeTypeMap).map(nativeType => {
