@@ -2,10 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const semtools = require('semantic-toolkit');
 const _1 = require(".");
+const model_1 = require("../model");
 function nativeTypesToTS() {
-    return Object.keys(_1.nativeTypeMap).map(nativeType => {
-        const iris = Object.keys(_1.nativeTypeMap[nativeType]);
-        return iris.map(iri => `export type ${_1.typeForIris([iri])} = ${nativeType};`).join('\n');
+    return Object.keys(model_1.nativeTypeMap).map(nativeType => {
+        const iris = Object.keys(model_1.nativeTypeMap[nativeType]);
+        return iris.map(iri => {
+            const aliasType = _1.typeForIris([iri]);
+            if (nativeType === aliasType)
+                return '';
+            return `export type ${aliasType} = ${nativeType};`;
+        }).join('\n');
     }).join('\n');
 }
 exports.nativeTypesToTS = nativeTypesToTS;

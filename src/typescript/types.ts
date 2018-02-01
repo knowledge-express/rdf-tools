@@ -1,12 +1,17 @@
 const semtools = require('semantic-toolkit');
-import { typeForIris, nativeTypeMap } from '.';
+import { typeForIris } from '.';
 
-import { Property, Class } from '../model';
+import { Property, Class, nativeTypeMap } from '../model';
 
 export function nativeTypesToTS() {
   return Object.keys(nativeTypeMap).map(nativeType => {
     const iris = Object.keys(nativeTypeMap[nativeType]);
-    return iris.map(iri => `export type ${typeForIris([ iri ])} = ${nativeType};`).join('\n')
+    return iris.map(iri => {
+      const aliasType = typeForIris([ iri ]);
+      // Skip when aliasing types to themselves
+      if (nativeType === aliasType) return '';
+      return `export type ${aliasType} = ${nativeType};`
+    }).join('\n')
   }).join('\n');
 }
 
