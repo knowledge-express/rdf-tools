@@ -25,16 +25,45 @@ exports.propertyToTS = propertyToTS;
 function classToTS(classObj, classIris) {
     const name = semtools.getLocalName(classObj.iri);
     const existingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) != -1);
-    const superTypes = existingSuperClasses.length === 0 ? '' : `${_1.typeForIris(existingSuperClasses)} &`;
+    const superTypes = existingSuperClasses.length === 0 ? 'RDF.Resource &' : `${_1.typeForIris(existingSuperClasses)} &`;
     return `export type ${name} = ${superTypes} {
     ${classObj.properties.map(propertyToTS).join('\n')}
   };
   `;
 }
 exports.classToTS = classToTS;
+function rdfResourceToTS() {
+    return `export module RDF {
+    export type Resource = {
+      id: string
+    };
+  };`;
+}
+exports.rdfResourceToTS = rdfResourceToTS;
+function classToTSAliases(classObj, classIris) {
+    const name = semtools.getLocalName(classObj.iri);
+    const propertyRanges = classObj.properties.reduce((memo, property) => [...memo, ...(property.isNative ? [] : property.range)], []);
+    const nonExistingPropertyClasses = propertyRanges.filter(c => classIris.indexOf(c) == -1);
+    const nonExistingSuperClasses = classObj.superClasses.filter(c => classIris.indexOf(c) == -1);
+    const nonExistingClasses = Object.keys([...nonExistingPropertyClasses, ...nonExistingSuperClasses].reduce((memo, key) => (Object.assign({}, memo, { [key]: true })), {}));
+    return nonExistingClasses;
+}
+exports.classToTSAliases = classToTSAliases;
+function aliasRDFResources(classesObj) {
+    const iris = classesObj.classes.map(c => c.iri);
+    const rdfTS = rdfResourceToTS();
+    const nonExistingClasses = Object.keys(classesObj.classes.reduce((memo, c) => [...memo, ...classToTSAliases(c, iris)], []).reduce((memo, key) => (Object.assign({}, memo, { [key]: true })), {}));
+    const aliasesTS = nonExistingClasses.map(iri => {
+        const aliasType = _1.typeForIris([iri]);
+        return `export type ${aliasType} = RDF.Resource;`;
+    }).join('\n');
+    return rdfTS + '\n' + aliasesTS;
+}
+exports.aliasRDFResources = aliasRDFResources;
 function classesToTS(classesObj) {
     const nativeTypeTS = nativeTypesToTS();
+    const aliasesTS = aliasRDFResources(classesObj);
     const iris = classesObj.classes.map(c => c.iri);
-    return nativeTypeTS + '\n' + classesObj.classes.map(c => classToTS(c, iris)).join('\n');
+    return nativeTypeTS + '\n' + aliasesTS + '\n' + classesObj.classes.map(c => classToTS(c, iris)).join('\n');
 }
 exports.classesToTS = classesToTS;
