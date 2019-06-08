@@ -9,7 +9,7 @@
     "rdf-tools": "dist/index.js"
   },
   "scripts": {
-    "dist": "tsc",
+    "dist": "tsc && chmod +x dist/index.js",
     "clean": "rm -rf dist",
     "pretest": "npm run clean && tsc --inlineSourceMap",
     "test": "nyc ava --verbose",

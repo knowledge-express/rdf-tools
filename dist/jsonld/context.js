@@ -25,7 +25,7 @@ function classToContextByPrefix(classObj) {
     }, contextsByPrefix);
 }
 exports.classToContextByPrefix = classToContextByPrefix;
-function getContext(prefixes, classes) {
+function getContext(prefixes, classes, basePrefix = "https://knowledge.express/") {
     const contextsByPrefix = classes.map(classToContextByPrefix).reduce((memo, contexts) => {
         return Object.keys(contexts).reduce((memo, prefix) => {
             if (prefix in memo)
@@ -37,7 +37,7 @@ function getContext(prefixes, classes) {
     }, {});
     return Object.keys(contextsByPrefix).map(prefix => {
         const context = contextsByPrefix[prefix];
-        return Object.assign({ "@vocab": prefix }, context);
+        return Object.assign({ "@vocab": prefix }, (prefix === basePrefix ? { "@base": prefix } : {}), context);
     });
 }
 exports.getContext = getContext;
