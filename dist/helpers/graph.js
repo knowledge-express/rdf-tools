@@ -6,7 +6,7 @@ function getRDFGraph(ontology) {
     const triples = triples_1.getTriples(ontology);
     return triples.reduce((graph, triple) => {
         const { subject, predicate, object } = triple;
-        graph.add(rdf.environment.createTriple(subject, predicate, object));
+        graph.add(rdf.environment.createTriple(subject.id, predicate.id, object.id));
         return graph;
     }, new rdf.Graph);
 }

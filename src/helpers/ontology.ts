@@ -3,7 +3,8 @@ import * as globby from 'globby';
 
 export async function getFiles(patterns: Array<string>): Promise<Array<string>> {
   // console.log('globbing pattern', patterns);
-  const paths = await globby(patterns, <any>{ expandDirectories: true })
+  const paths = await globby(patterns, <any>{ expandDirectories: true });
+  const sorted = paths.sort();
   // console.log('Got paths:', paths);
   return paths.map(name => fs.readFileSync(name).toString());
 }

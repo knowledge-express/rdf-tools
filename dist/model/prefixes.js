@@ -13,7 +13,8 @@ function getPrefixes(ontology) {
     return __awaiter(this, void 0, void 0, function* () {
         return (new Promise((resolve, reject) => {
             var prefixes;
-            N3.Parser().parse(ontology, (error, triple, p) => {
+            const parser = new N3.Parser();
+            parser.parse(ontology, (error, triple, p) => {
                 if (error)
                     return reject(error);
                 prefixes = prefixes ? prefixes : p;

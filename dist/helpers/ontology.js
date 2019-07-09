@@ -13,6 +13,7 @@ const globby = require("globby");
 function getFiles(patterns) {
     return __awaiter(this, void 0, void 0, function* () {
         const paths = yield globby(patterns, { expandDirectories: true });
+        const sorted = paths.sort();
         return paths.map(name => fs.readFileSync(name).toString());
     });
 }

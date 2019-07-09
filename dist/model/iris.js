@@ -18,7 +18,7 @@ function getIRIs(ontology) {
         const prefixMap = Helpers.invertObject(prefixes);
         const iris = triples.reduce((memo, triple) => {
             const { subject, predicate, object } = triple;
-            return [...memo, subject, predicate, object];
+            return [...memo, subject.id, predicate.id, object.id];
         }, []).reduce((memo, maybeIri) => {
             if (!semtools.isIri(maybeIri))
                 return memo;

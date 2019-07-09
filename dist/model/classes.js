@@ -30,8 +30,8 @@ function isNativeType(iris) {
 }
 exports.isNativeType = isNativeType;
 function expandProperty(graph, iri) {
-    const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).map(t => t.object);
-    const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#FunctionalProperty').length > 0;
+    const range = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#range', null).toArray().map(t => t.object.nominalValue);
+    const isFunctional = graph.match(iri, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#FunctionalProperty').toArray().length > 0;
     const isNative = isNativeType(range);
     return {
         iri,
@@ -42,9 +42,9 @@ function expandProperty(graph, iri) {
 }
 exports.expandProperty = expandProperty;
 function expandClass(graph, iri) {
-    const subClasses = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', iri).map(t => t.subject);
-    const superClasses = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', null).map(t => t.object);
-    const properties = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#domain', iri).map(t => t.subject).map(p => expandProperty(graph, p));
+    const subClasses = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', iri).toArray().map(t => t.subject.nominalValue);
+    const superClasses = graph.match(iri, 'http://www.w3.org/2000/01/rdf-schema#subClassOf', null).toArray().map(t => t.object.nominalValue);
+    const properties = graph.match(null, 'http://www.w3.org/2000/01/rdf-schema#domain', iri).toArray().map(t => t.subject.nominalValue).map(p => expandProperty(graph, p));
     return {
         iri,
         subClasses,
@@ -57,7 +57,7 @@ function getClasses(ontology) {
     return __awaiter(this, void 0, void 0, function* () {
         const graph = Helpers.getRDFGraph(ontology);
         const classIris = graph.match(null, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/2002/07/owl#Class')
-            .map(t => t.subject);
+            .toArray().map(t => t.subject.nominalValue);
         const classes = classIris.map(iri => expandClass(graph, iri));
         return {
             exports: [],
