@@ -1,9 +1,9 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/feedbackfruits-knowledge
+    working_directory: ~/rdf-tools
     docker:
-      - image: node:8
+      - image: node:10
         environment:
           NODE_ENV: test
     steps:
